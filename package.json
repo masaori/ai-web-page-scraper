@@ -1,0 +1,45 @@
+{
+  "name": "kindle-cloud-scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.ts",
+  "scripts": {
+    "start": "ts-node ./src/index.ts",
+    "fmt": "prettier --write \"**/*.ts\" && eslint --fix \"**/*.ts\"",
+    "gen": "npm run gen:interface-repositories && npm run gen:vector-db-repositories && npm run fmt",
+    "gen:interface-repositories": "ts-node scripts/generateInterfaceRepositories.ts",
+    "gen:vector-db-repositories": "ts-node scripts/generateVectorDbRepositories.ts",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "devDependencies": {
+    "@graphql-eslint/eslint-plugin": "^3.20.1",
+    "@types/uuid": "^9.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "eslint": "^8.5.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest-formatting": "^3.1.0",
+    "eslint-plugin-no-type-assertion": "^1.3.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "prettier": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@google-cloud/vision": "^4.0.1",
+    "@qdrant/js-client-rest": "^1.4.0",
+    "@sniptt/monads": "^0.5.10",
+    "ast-to-entity-definitions": "^1.9.0",
+    "buffer-image-size": "^0.6.4",
+    "change-case": "^4.1.2",
+    "openai": "^4.0.0",
+    "puppeteer": "^21.0.2",
+    "uuid": "^9.0.0"
+  }
+}

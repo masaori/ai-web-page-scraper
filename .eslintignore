@@ -1,0 +1,12 @@
+typeorm
+env
+build
+coverage
+.DS_Store
+*.md
+
+jest.config.js
+setupJest.js
+jest.d.ts
+node_modules
+tmp

@@ -1,0 +1,17 @@
+clients
+.gitkeep
+*ignore
+*.env
+.idea
+.github
+*.log
+*.map
+build
+coverage
+*.sh
+package-lock.json
+pgdata
+.node-version
+.DS_Store
+node_modules
+tmp
