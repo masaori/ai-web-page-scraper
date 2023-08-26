@@ -2,7 +2,7 @@ import { ActionPlanWithAssociation } from '../../domain/entities/_gen/ActionPlan
 import { UserRequestWithAssociation } from '../../domain/entities/_gen/UserRequestWithAssociation'
 import { WebPageWithAssociation } from '../../domain/entities/_gen/WebPageWithAssociation'
 import { OpenAiClient } from '../_shared/OpenAiClient'
-import { amazonPrimeVideoRankingWebPageElements } from '../_shared/fixtures/WebPageElement'
+import { amazonPrimeVideoRankingWebPageElements, amazonPrimeVideoRankingWebPageUrl } from '../_shared/fixtures/WebPageElement'
 import { LlmActionPlanPredictor } from './LlmActionPlanPredictor'
 
 describe('LlmActionPlanPredictor', () => {
@@ -15,7 +15,7 @@ describe('LlmActionPlanPredictor', () => {
 
       const webPage: WebPageWithAssociation = {
         id: 'webPageId',
-        url: 'https://www.amazon.co.jp/gp/bestsellers/instant-video/',
+        url: amazonPrimeVideoRankingWebPageUrl,
         width: 100,
         height: 100,
         webPageElements: amazonPrimeVideoRankingWebPageElements.filter((el) => el.type === 'pageLink'),
@@ -31,7 +31,7 @@ describe('LlmActionPlanPredictor', () => {
           4. Click next category and move to the category page.
           5. Repeat 1-4 until all categories are done.
         `,
-        url: 'https://www.amazon.co.jp/gp/bestsellers/instant-video/',
+        url: amazonPrimeVideoRankingWebPageUrl,
         actionPlans,
       }
 

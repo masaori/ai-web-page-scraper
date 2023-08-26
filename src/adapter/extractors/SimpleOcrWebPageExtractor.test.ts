@@ -1,15 +1,15 @@
 import * as path from 'path'
 import { GoogleCloudVisionClient } from '../_shared/GoogleCloudVisionClient'
 import { PuppeteerClient } from '../_shared/PuppeteerClient'
-import { OcrWebPageExtractor } from './OcrWebPageExtractor'
+import { SimpleOcrWebPageExtractor } from './SimpleOcrWebPageExtractor'
 
-describe('OcrWebPageExtractor', () => {
+describe('SimpleOcrWebPageExtractor', () => {
   test(
     'extractByUrl',
     async () => {
       const puppeteerClient = new PuppeteerClient(path.resolve(path.join(__dirname, '../../../tmp')))
       const googleCloudVisionClient = new GoogleCloudVisionClient()
-      const ocrWebPageExtractor = new OcrWebPageExtractor(puppeteerClient, googleCloudVisionClient)
+      const ocrWebPageExtractor = new SimpleOcrWebPageExtractor(puppeteerClient, googleCloudVisionClient)
 
       const result = await ocrWebPageExtractor.extractByUrl('https://www.amazon.co.jp/gp/bestsellers/instant-video/')
 

@@ -2,12 +2,12 @@ import { Ok } from '@sniptt/monads'
 import { v4 as uuid } from 'uuid'
 import { PromisedResult, UnknownRuntimeError, unknownRuntimeError } from '../../_shared/error'
 import { PuppeteerClient } from '../_shared/PuppeteerClient'
-import { WebPageExtractor } from '../../domain/interfaces/extractors'
 import { WebPageWithAssociation } from '../../domain/entities/_gen/WebPageWithAssociation'
 import { GoogleCloudVisionClient } from '../_shared/GoogleCloudVisionClient'
 import { WebPageElementWithAssociation } from '../../domain/entities/_gen/WebPageElementWithAssociation'
+import { WebPageExtractor } from '../../domain/interfaces/extractors/WebPageExtractor'
 
-export class OcrWebPageExtractor implements WebPageExtractor {
+export class SimpleOcrWebPageExtractor implements WebPageExtractor {
   constructor(
     private readonly puppeteerClient: PuppeteerClient,
     private readonly googleCloudVisionClient: GoogleCloudVisionClient,

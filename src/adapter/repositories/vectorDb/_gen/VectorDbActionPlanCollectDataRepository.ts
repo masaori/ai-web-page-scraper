@@ -19,8 +19,8 @@ const isActionPlanCollectData = (entity: unknown): entity is ActionPlanCollectDa
     typeof entity.type === 'string' &&
     'name' in entity &&
     typeof entity.name === 'string' &&
-    'url' in entity &&
-    typeof entity.url === 'string' &&
+    'webPageUrl' in entity &&
+    typeof entity.webPageUrl === 'string' &&
     'description' in entity &&
     typeof entity.description === 'string'
   )

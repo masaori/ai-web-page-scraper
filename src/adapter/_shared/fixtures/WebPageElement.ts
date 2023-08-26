@@ -1,5 +1,7 @@
 import { WebPageElementWithAssociation } from '../../../domain/entities/_gen/WebPageElementWithAssociation'
 
+export const amazonPrimeVideoRankingWebPageUrl = 'https://www.amazon.co.jp/gp/bestsellers/instant-video/'
+
 export const amazonPrimeVideoRankingWebPageElements: WebPageElementWithAssociation[] = [
   {
     id: '9eff22dc-e595-41a6-8099-f06efb694df6',

@@ -13,8 +13,8 @@ export const checkEntityTypeActionPlanCollectData = (entity: unknown): entity is
     !(entity.type === 'collectData') ||
     !('name' in entity) ||
     typeof entity.name !== 'string' ||
-    !('url' in entity) ||
-    typeof entity.url !== 'string' ||
+    !('webPageUrl' in entity) ||
+    typeof entity.webPageUrl !== 'string' ||
     !('description' in entity) ||
     typeof entity.description !== 'string'
   ) {

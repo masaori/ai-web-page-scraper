@@ -5,6 +5,6 @@ export type ActionPlanCollectData = {
   actionPlanId: Unique<ActionPlan['id']>
   type: 'collectData'
   name: string
-  url: string
+  webPageUrl: string
   description: string
 }
