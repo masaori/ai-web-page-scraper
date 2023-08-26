@@ -4,10 +4,11 @@ import { ActionPlanCreateSpreadsheet } from '../../../entities/ActionPlanCreateS
 import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
 
 export interface ActionPlanCreateSpreadsheetRepository {
+  issueId: () => PromisedResult<string, UnknownRuntimeError>
   getAll: () => PromisedResult<ActionPlanCreateSpreadsheet[], UnknownRuntimeError>
   getRelevant: (text: string, limit: number) => PromisedResult<ActionPlanCreateSpreadsheet[], UnknownRuntimeError>
-  create: (entity: ActionPlanCreateSpreadsheet) => PromisedResult<ActionPlanCreateSpreadsheet, UnknownRuntimeError>
-  update: (entity: ActionPlanCreateSpreadsheet) => PromisedResult<ActionPlanCreateSpreadsheet, UnknownRuntimeError>
-  delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+  create: (entity: ActionPlanCreateSpreadsheet) => PromisedResult<ActionPlanCreateSpreadsheet, UnknownRuntimeError | AlreadyExistsError>
+  update: (entity: ActionPlanCreateSpreadsheet) => PromisedResult<ActionPlanCreateSpreadsheet, UnknownRuntimeError | NotFoundError>
+  delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
   getByActionPlanId: (ActionPlanId: ActionPlan['id']) => PromisedResult<ActionPlanCreateSpreadsheet | null, UnknownRuntimeError>
 }

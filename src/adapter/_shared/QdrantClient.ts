@@ -5,6 +5,8 @@ export class QdrantClient {
     url: 'http://localhost:6333',
   })
 
+  getCollections: typeof this.client.getCollections = (...args) => this.client.getCollections(...args)
+
   createCollection: typeof this.client.createCollection = (...args) => this.client.createCollection(...args)
 
   deleteCollection: typeof this.client.deleteCollection = (...args) => this.client.deleteCollection(...args)

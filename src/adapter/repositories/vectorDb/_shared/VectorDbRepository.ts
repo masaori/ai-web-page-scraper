@@ -1,4 +1,6 @@
 import { NotFoundError } from 'openai/error'
+import { v4 as uuidv4 } from 'uuid'
+
 import { PromisedResult, UnknownRuntimeError, AlreadyExistsError, unknownRuntimeError } from '../../../../_shared/error'
 import { QdrantClient } from '../../../_shared/QdrantClient'
 import { excludeNull } from '../../../../_shared/array'
@@ -14,6 +16,8 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
     protected readonly qdrantClient: QdrantClient,
     protected readonly openAiClient: OpenAiClient,
   ) {}
+
+  issueId = async (): PromisedResult<string, UnknownRuntimeError> => Ok(uuidv4().toString())
 
   getByPrimaryKey = async (primaryKey: string): PromisedResult<T | null, UnknownRuntimeError> => {
     try {

@@ -3,10 +3,11 @@ import { UserRequest } from '../../../entities/UserRequest'
 import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
 
 export interface UserRequestRepository {
+  issueId: () => PromisedResult<string, UnknownRuntimeError>
   getAll: () => PromisedResult<UserRequest[], UnknownRuntimeError>
   getRelevant: (text: string, limit: number) => PromisedResult<UserRequest[], UnknownRuntimeError>
-  create: (entity: UserRequest) => PromisedResult<UserRequest, UnknownRuntimeError>
-  update: (entity: UserRequest) => PromisedResult<UserRequest, UnknownRuntimeError>
-  delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+  create: (entity: UserRequest) => PromisedResult<UserRequest, UnknownRuntimeError | AlreadyExistsError>
+  update: (entity: UserRequest) => PromisedResult<UserRequest, UnknownRuntimeError | NotFoundError>
+  delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
   getById: (id: string) => PromisedResult<UserRequest | null, UnknownRuntimeError>
 }

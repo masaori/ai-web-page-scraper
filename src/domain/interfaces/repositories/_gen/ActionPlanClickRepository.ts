@@ -4,10 +4,11 @@ import { ActionPlanClick } from '../../../entities/ActionPlanClick'
 import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
 
 export interface ActionPlanClickRepository {
+  issueId: () => PromisedResult<string, UnknownRuntimeError>
   getAll: () => PromisedResult<ActionPlanClick[], UnknownRuntimeError>
   getRelevant: (text: string, limit: number) => PromisedResult<ActionPlanClick[], UnknownRuntimeError>
-  create: (entity: ActionPlanClick) => PromisedResult<ActionPlanClick, UnknownRuntimeError>
-  update: (entity: ActionPlanClick) => PromisedResult<ActionPlanClick, UnknownRuntimeError>
-  delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+  create: (entity: ActionPlanClick) => PromisedResult<ActionPlanClick, UnknownRuntimeError | AlreadyExistsError>
+  update: (entity: ActionPlanClick) => PromisedResult<ActionPlanClick, UnknownRuntimeError | NotFoundError>
+  delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
   getByActionPlanId: (ActionPlanId: ActionPlan['id']) => PromisedResult<ActionPlanClick | null, UnknownRuntimeError>
 }

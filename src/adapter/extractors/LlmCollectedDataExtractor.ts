@@ -7,9 +7,13 @@ import { WebPageElementWithAssociation } from '../../domain/entities/_gen/WebPag
 import { CollectedDataExtractor } from '../../domain/interfaces/extractors/CollectedDataExtractor'
 import { OpenAiClient } from '../_shared/OpenAiClient'
 import { Ok } from '@sniptt/monads'
+import { FileSystemClient } from '../_shared/FileSystemClient'
 
 export class LlmCollectedDataExtractor implements CollectedDataExtractor {
-  constructor(private readonly openAiClient: OpenAiClient) {}
+  constructor(
+    private readonly openAiClient: OpenAiClient,
+    private readonly fileSystemClient: FileSystemClient,
+  ) {}
 
   extractByWebPageElementsAndActionPlanCollectData = async (
     webPageElements: WebPageElementWithAssociation[],
@@ -103,13 +107,16 @@ export class LlmCollectedDataExtractor implements CollectedDataExtractor {
       }
     }
 
-    console.log(JSON.stringify(parsedMessageContent, null, 2))
-
     const collectedDataId = uuid().toString()
-
-    return Ok({
+    const collectedDataWithAssociation: CollectedDataWithAssociation = {
       id: collectedDataId,
       ...actionPlanCollectData,
-    })
+      dataJson: JSON.stringify(parsedMessageContent),
+      spreadsheetSheet: null,
+    }
+
+    console.log(`[LlmCollectedDataExtractor] extractByWebPageElementsAndActionPlanCollectData: ${JSON.stringify(parsedMessageContent, null, 2)}`)
+
+    return Ok(collectedDataWithAssociation)
   }
 }

@@ -4,10 +4,11 @@ import { ActionPlanAppendSheetToSpreadsheet } from '../../../entities/ActionPlan
 import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
 
 export interface ActionPlanAppendSheetToSpreadsheetRepository {
+  issueId: () => PromisedResult<string, UnknownRuntimeError>
   getAll: () => PromisedResult<ActionPlanAppendSheetToSpreadsheet[], UnknownRuntimeError>
   getRelevant: (text: string, limit: number) => PromisedResult<ActionPlanAppendSheetToSpreadsheet[], UnknownRuntimeError>
-  create: (entity: ActionPlanAppendSheetToSpreadsheet) => PromisedResult<ActionPlanAppendSheetToSpreadsheet, UnknownRuntimeError>
-  update: (entity: ActionPlanAppendSheetToSpreadsheet) => PromisedResult<ActionPlanAppendSheetToSpreadsheet, UnknownRuntimeError>
-  delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+  create: (entity: ActionPlanAppendSheetToSpreadsheet) => PromisedResult<ActionPlanAppendSheetToSpreadsheet, UnknownRuntimeError | AlreadyExistsError>
+  update: (entity: ActionPlanAppendSheetToSpreadsheet) => PromisedResult<ActionPlanAppendSheetToSpreadsheet, UnknownRuntimeError | NotFoundError>
+  delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
   getByActionPlanId: (ActionPlanId: ActionPlan['id']) => PromisedResult<ActionPlanAppendSheetToSpreadsheet | null, UnknownRuntimeError>
 }

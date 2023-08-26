@@ -4,10 +4,11 @@ import { ActionPlanCollectData } from '../../../entities/ActionPlanCollectData'
 import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
 
 export interface ActionPlanCollectDataRepository {
+  issueId: () => PromisedResult<string, UnknownRuntimeError>
   getAll: () => PromisedResult<ActionPlanCollectData[], UnknownRuntimeError>
   getRelevant: (text: string, limit: number) => PromisedResult<ActionPlanCollectData[], UnknownRuntimeError>
-  create: (entity: ActionPlanCollectData) => PromisedResult<ActionPlanCollectData, UnknownRuntimeError>
-  update: (entity: ActionPlanCollectData) => PromisedResult<ActionPlanCollectData, UnknownRuntimeError>
-  delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+  create: (entity: ActionPlanCollectData) => PromisedResult<ActionPlanCollectData, UnknownRuntimeError | AlreadyExistsError>
+  update: (entity: ActionPlanCollectData) => PromisedResult<ActionPlanCollectData, UnknownRuntimeError | NotFoundError>
+  delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
   getByActionPlanId: (ActionPlanId: ActionPlan['id']) => PromisedResult<ActionPlanCollectData | null, UnknownRuntimeError>
 }

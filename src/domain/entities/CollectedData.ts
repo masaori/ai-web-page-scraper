@@ -3,4 +3,5 @@ export type CollectedData = {
   name: string
   webPageUrl: string
   description: string
+  dataJson: string
 }

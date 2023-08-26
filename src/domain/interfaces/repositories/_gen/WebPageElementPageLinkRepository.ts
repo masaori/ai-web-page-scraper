@@ -4,10 +4,11 @@ import { WebPageElementPageLink } from '../../../entities/WebPageElementPageLink
 import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
 
 export interface WebPageElementPageLinkRepository {
+  issueId: () => PromisedResult<string, UnknownRuntimeError>
   getAll: () => PromisedResult<WebPageElementPageLink[], UnknownRuntimeError>
   getRelevant: (text: string, limit: number) => PromisedResult<WebPageElementPageLink[], UnknownRuntimeError>
-  create: (entity: WebPageElementPageLink) => PromisedResult<WebPageElementPageLink, UnknownRuntimeError>
-  update: (entity: WebPageElementPageLink) => PromisedResult<WebPageElementPageLink, UnknownRuntimeError>
-  delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+  create: (entity: WebPageElementPageLink) => PromisedResult<WebPageElementPageLink, UnknownRuntimeError | AlreadyExistsError>
+  update: (entity: WebPageElementPageLink) => PromisedResult<WebPageElementPageLink, UnknownRuntimeError | NotFoundError>
+  delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
   getByWebPageElementId: (WebPageElementId: WebPageElement['id']) => PromisedResult<WebPageElementPageLink | null, UnknownRuntimeError>
 }

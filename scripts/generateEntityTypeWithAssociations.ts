@@ -78,7 +78,17 @@ export const generateEntityTypeWithAssociations = async () => {
       // Unique Referrencing entities
       ${uniqueReferrencingEntities
         .map((referencingEntity) => {
-          return `${camelCase(referencingEntity.name)}: ${pascalCase(referencingEntity.name)}WithAssociation`
+          const property = referencingEntity.properties.find((property) => property.isReference && property.targetEntityDefinitionName === entityDefinition.name)
+
+          if (!property) {
+            throw new Error(`[generateEntityTypeWithAssociations] property not found`)
+          }
+
+          if (property.isNullable) {
+            return `${camelCase(referencingEntity.name)}: ${pascalCase(referencingEntity.name)}WithAssociation | null`
+          } else {
+            return `${camelCase(referencingEntity.name)}: ${pascalCase(referencingEntity.name)}WithAssociation`
+          }
         })
         .join('\n')}
       // Non-unique Referrencing entities

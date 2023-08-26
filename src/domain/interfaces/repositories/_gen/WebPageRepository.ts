@@ -3,10 +3,11 @@ import { WebPage } from '../../../entities/WebPage'
 import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
 
 export interface WebPageRepository {
+  issueId: () => PromisedResult<string, UnknownRuntimeError>
   getAll: () => PromisedResult<WebPage[], UnknownRuntimeError>
   getRelevant: (text: string, limit: number) => PromisedResult<WebPage[], UnknownRuntimeError>
-  create: (entity: WebPage) => PromisedResult<WebPage, UnknownRuntimeError>
-  update: (entity: WebPage) => PromisedResult<WebPage, UnknownRuntimeError>
-  delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+  create: (entity: WebPage) => PromisedResult<WebPage, UnknownRuntimeError | AlreadyExistsError>
+  update: (entity: WebPage) => PromisedResult<WebPage, UnknownRuntimeError | NotFoundError>
+  delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
   getById: (id: string) => PromisedResult<WebPage | null, UnknownRuntimeError>
 }

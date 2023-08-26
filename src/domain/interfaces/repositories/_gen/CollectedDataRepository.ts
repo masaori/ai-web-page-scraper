@@ -3,10 +3,11 @@ import { CollectedData } from '../../../entities/CollectedData'
 import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
 
 export interface CollectedDataRepository {
+  issueId: () => PromisedResult<string, UnknownRuntimeError>
   getAll: () => PromisedResult<CollectedData[], UnknownRuntimeError>
   getRelevant: (text: string, limit: number) => PromisedResult<CollectedData[], UnknownRuntimeError>
-  create: (entity: CollectedData) => PromisedResult<CollectedData, UnknownRuntimeError>
-  update: (entity: CollectedData) => PromisedResult<CollectedData, UnknownRuntimeError>
-  delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+  create: (entity: CollectedData) => PromisedResult<CollectedData, UnknownRuntimeError | AlreadyExistsError>
+  update: (entity: CollectedData) => PromisedResult<CollectedData, UnknownRuntimeError | NotFoundError>
+  delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
   getById: (id: string) => PromisedResult<CollectedData | null, UnknownRuntimeError>
 }

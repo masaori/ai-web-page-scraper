@@ -20,11 +20,12 @@ export const generateInterfaceRepositories = async () => {
       ${entityDefinitions.map((entityDefinition) => `import { ${pascalCase(entityDefinition.name)} } from '../../../entities/${pascalCase(entityDefinition.name)}'`).join('\n')}
       import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
       export interface ${pascalCase(entityDefinition.name)}Repository {
+      issueId: () => PromisedResult<string, UnknownRuntimeError>
       getAll: () => PromisedResult<${pascalCase(entityDefinition.name)}[], UnknownRuntimeError>
       getRelevant: (text: string, limit: number) => PromisedResult<${pascalCase(entityDefinition.name)}[], UnknownRuntimeError>
-      create: (entity: ${pascalCase(entityDefinition.name)}) => PromisedResult<${pascalCase(entityDefinition.name)}, UnknownRuntimeError>
-      update: (entity: ${pascalCase(entityDefinition.name)}) => PromisedResult<${pascalCase(entityDefinition.name)}, UnknownRuntimeError>
-      delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+      create: (entity: ${pascalCase(entityDefinition.name)}) => PromisedResult<${pascalCase(entityDefinition.name)}, UnknownRuntimeError | AlreadyExistsError>
+      update: (entity: ${pascalCase(entityDefinition.name)}) => PromisedResult<${pascalCase(entityDefinition.name)}, UnknownRuntimeError | NotFoundError>
+      delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
       ${excludeNull(
         entityDefinition.properties.map((property) => {
           if (property.isReference) {

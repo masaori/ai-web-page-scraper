@@ -14,7 +14,9 @@ export const checkEntityTypeCollectedData = (entity: unknown): entity is Collect
     !('webPageUrl' in entity) ||
     typeof entity.webPageUrl !== 'string' ||
     !('description' in entity) ||
-    typeof entity.description !== 'string'
+    typeof entity.description !== 'string' ||
+    !('dataJson' in entity) ||
+    typeof entity.dataJson !== 'string'
   ) {
     // console.log(`[checkEntityTypeCollectedData] entity is not CollectedData: ${JSON.stringify(entity)}`)
     return false

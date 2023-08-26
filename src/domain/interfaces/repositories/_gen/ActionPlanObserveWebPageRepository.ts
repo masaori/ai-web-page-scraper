@@ -4,10 +4,11 @@ import { ActionPlanObserveWebPage } from '../../../entities/ActionPlanObserveWeb
 import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
 
 export interface ActionPlanObserveWebPageRepository {
+  issueId: () => PromisedResult<string, UnknownRuntimeError>
   getAll: () => PromisedResult<ActionPlanObserveWebPage[], UnknownRuntimeError>
   getRelevant: (text: string, limit: number) => PromisedResult<ActionPlanObserveWebPage[], UnknownRuntimeError>
-  create: (entity: ActionPlanObserveWebPage) => PromisedResult<ActionPlanObserveWebPage, UnknownRuntimeError>
-  update: (entity: ActionPlanObserveWebPage) => PromisedResult<ActionPlanObserveWebPage, UnknownRuntimeError>
-  delete: (id: string) => PromisedResult<void, UnknownRuntimeError>
+  create: (entity: ActionPlanObserveWebPage) => PromisedResult<ActionPlanObserveWebPage, UnknownRuntimeError | AlreadyExistsError>
+  update: (entity: ActionPlanObserveWebPage) => PromisedResult<ActionPlanObserveWebPage, UnknownRuntimeError | NotFoundError>
+  delete: (id: string) => PromisedResult<void, UnknownRuntimeError | NotFoundError>
   getByActionPlanId: (ActionPlanId: ActionPlan['id']) => PromisedResult<ActionPlanObserveWebPage | null, UnknownRuntimeError>
 }
