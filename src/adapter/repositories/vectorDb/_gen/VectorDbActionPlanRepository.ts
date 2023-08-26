@@ -22,10 +22,12 @@ const isActionPlan = (entity: unknown): entity is ActionPlan => {
   )
 }
 
-export class VectorDbActionPlanRepository extends VectorDbRepository<ActionPlan> {
+export class VectorDbActionPlanRepository extends VectorDbRepository<'id', ActionPlan> {
   constructor(qdrantClient: QdrantClient, openAiClient: OpenAiClient) {
-    super(qdrantCollectionName, isActionPlan, qdrantClient, openAiClient)
+    super('id', qdrantCollectionName, isActionPlan, qdrantClient, openAiClient)
   }
+
+  getById = async (id: string): PromisedResult<ActionPlan | null, UnknownRuntimeError> => this.getByPrimaryKey(id)
 
   getAllByUserRequestId = async (userRequestId: string): PromisedResult<ActionPlan[], UnknownRuntimeError> => {
     try {

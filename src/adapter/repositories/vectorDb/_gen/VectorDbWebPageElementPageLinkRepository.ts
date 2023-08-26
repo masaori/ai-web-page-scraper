@@ -13,44 +13,22 @@ const isWebPageElementPageLink = (entity: unknown): entity is WebPageElementPage
   return (
     typeof entity === 'object' &&
     entity !== null &&
-    'id' in entity &&
-    typeof entity.id === 'string' &&
     'webPageElementId' in entity &&
     typeof entity.webPageElementId === 'string' &&
+    'type' in entity &&
+    typeof entity.type === 'string' &&
+    'text' in entity &&
+    typeof entity.text === 'string' &&
     'url' in entity &&
     typeof entity.url === 'string'
   )
 }
 
-export class VectorDbWebPageElementPageLinkRepository extends VectorDbRepository<WebPageElementPageLink> {
+export class VectorDbWebPageElementPageLinkRepository extends VectorDbRepository<'webPageElementId', WebPageElementPageLink> {
   constructor(qdrantClient: QdrantClient, openAiClient: OpenAiClient) {
-    super(qdrantCollectionName, isWebPageElementPageLink, qdrantClient, openAiClient)
+    super('webPageElementId', qdrantCollectionName, isWebPageElementPageLink, qdrantClient, openAiClient)
   }
 
-  getByWebPageElementId = async (webPageElementId: string): PromisedResult<WebPageElementPageLink | null, UnknownRuntimeError> => {
-    try {
-      const scrollResult = await this.qdrantClient.scroll(this.qdrantCollectionName)
-      const entities = scrollResult.points
-        .map((point) => {
-          if (!point.payload) {
-            console.error(`[VectorDbWebPageElementPageLinkRepository] getByWebPageElementId: point.payload is null. Ignored ${point.id}`)
-
-            return null
-          }
-
-          return this.isEntityType(point.payload) ? point.payload : null
-        })
-        .filter((entity): entity is WebPageElementPageLink => !!entity && entity.webPageElementId === webPageElementId)
-
-      return Ok(entities[0] ?? null)
-    } catch (e) {
-      console.error(`[VectorDbWebPageElementPageLinkRepository] getByWebPageElementId: ${JSON.stringify(e)}`)
-
-      if (e instanceof Error) {
-        return unknownRuntimeError(e.message)
-      } else {
-        return unknownRuntimeError(JSON.stringify(e))
-      }
-    }
-  }
+  getByWebPageElementId = async (webPageElementId: string): PromisedResult<WebPageElementPageLink | null, UnknownRuntimeError> =>
+    this.getByPrimaryKey(webPageElementId)
 }

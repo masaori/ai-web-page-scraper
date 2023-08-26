@@ -24,8 +24,10 @@ const isWebPage = (entity: unknown): entity is WebPage => {
   )
 }
 
-export class VectorDbWebPageRepository extends VectorDbRepository<WebPage> {
+export class VectorDbWebPageRepository extends VectorDbRepository<'id', WebPage> {
   constructor(qdrantClient: QdrantClient, openAiClient: OpenAiClient) {
-    super(qdrantCollectionName, isWebPage, qdrantClient, openAiClient)
+    super('id', qdrantCollectionName, isWebPage, qdrantClient, openAiClient)
   }
+
+  getById = async (id: string): PromisedResult<WebPage | null, UnknownRuntimeError> => this.getByPrimaryKey(id)
 }

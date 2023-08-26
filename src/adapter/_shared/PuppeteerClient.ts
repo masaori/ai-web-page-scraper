@@ -1,6 +1,6 @@
 import path from 'path'
 import fs from 'fs'
-import puppeteer, { Browser, Page } from 'puppeteer'
+import puppeteer, { Browser, ElementHandle, Page } from 'puppeteer'
 import imageSizeFromBuffer from 'buffer-image-size'
 
 export class PuppeteerClient {
@@ -10,13 +10,11 @@ export class PuppeteerClient {
 
   private captureResultByUrl: Record<string, { imageFilePath: string; imageWidth: number; imageHeight: number }> = {}
 
-  private absoluteScreenshotDirectoryPath: string
-
-  constructor(screenshotDirectoryPath: string) {
-    this.absoluteScreenshotDirectoryPath = path.join(__dirname, screenshotDirectoryPath)
+  constructor(private absoluteScreenshotDirectoryPath: string) {
+    console.log(`[PuppeteerClient]: absoluteScreenshotDirectoryPath: ${absoluteScreenshotDirectoryPath}`)
 
     if (!fs.existsSync(this.absoluteScreenshotDirectoryPath)) {
-      fs.mkdirSync(this.absoluteScreenshotDirectoryPath, { recursive: true })
+      throw new Error(`[PuppeteerClient]: Directory does not exist: ${this.absoluteScreenshotDirectoryPath}`)
     }
   }
 
@@ -24,7 +22,7 @@ export class PuppeteerClient {
     if (this.browser) {
       return
     }
-    this.browser = await puppeteer.launch({ headless: false })
+    this.browser = await puppeteer.launch({ headless: 'new' })
   }
 
   private clickPointWithRetry = async (page: Page, point: { x: number; y: number }, retryCount = 60) => {
@@ -63,6 +61,26 @@ export class PuppeteerClient {
     return
   }
 
+  closePageByUrl = async (url: string): Promise<void> => {
+    await this.launchBrowser()
+
+    if (!this.browser) {
+      return
+    }
+
+    if (!this.pageByUrl[url]) {
+      return
+    }
+
+    await this.pageByUrl[url].close()
+    delete this.pageByUrl[url]
+
+    if (Object.keys(this.pageByUrl).length === 0) {
+      await this.browser.close()
+      this.browser = null
+    }
+  }
+
   capturePageByUrl = async (
     url: string,
     options?: {
@@ -76,7 +94,8 @@ export class PuppeteerClient {
   }> => {
     const fullPage = options?.fullPage ?? true
     const useCache = options?.useCache ?? false
-    const imageFilePath = path.join(this.absoluteScreenshotDirectoryPath, `${url}.png`)
+    const escapedUrl = url.replace(/[^a-zA-Z0-9]/g, '_')
+    const imageFilePath = path.join(this.absoluteScreenshotDirectoryPath, `${escapedUrl}.png`)
 
     if (useCache && this.captureResultByUrl[url]) {
       return this.captureResultByUrl[url]
@@ -91,8 +110,6 @@ export class PuppeteerClient {
 
     const page = this.pageByUrl[url]
 
-    await page.goto(url)
-    await page.waitForNetworkIdle()
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     await page.screenshot({
@@ -127,7 +144,7 @@ export class PuppeteerClient {
     await this.clickPointWithRetry(page, point)
   }
 
-  getElementByPoint = async (url: string, point: { x: number; y: number }) => {
+  getElementsByPoint = async (url: string, point: { x: number; y: number }): Promise<ElementHandle<Element>[]> => {
     await this.launchBrowser()
 
     if (!this.browser) {
@@ -137,8 +154,10 @@ export class PuppeteerClient {
 
     const page = this.pageByUrl[url]
 
-    return await page.evaluate(() => {
-      return document.elementFromPoint(point.x, point.y)
-    })
+    await page.mouse.move(point.x, point.y)
+
+    const hoveredElements = await page.$$(':hover')
+
+    return hoveredElements
   }
 }

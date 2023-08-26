@@ -22,8 +22,10 @@ const isUserRequest = (entity: unknown): entity is UserRequest => {
   )
 }
 
-export class VectorDbUserRequestRepository extends VectorDbRepository<UserRequest> {
+export class VectorDbUserRequestRepository extends VectorDbRepository<'id', UserRequest> {
   constructor(qdrantClient: QdrantClient, openAiClient: OpenAiClient) {
-    super(qdrantCollectionName, isUserRequest, qdrantClient, openAiClient)
+    super('id', qdrantCollectionName, isUserRequest, qdrantClient, openAiClient)
   }
+
+  getById = async (id: string): PromisedResult<UserRequest | null, UnknownRuntimeError> => this.getByPrimaryKey(id)
 }

@@ -4,5 +4,6 @@ import { WebPageElement } from './WebPageElement'
 export type WebPageElementPageLink = {
   webPageElementId: Unique<WebPageElement['id']>
   type: 'pageLink'
+  text: string
   url: string
 }

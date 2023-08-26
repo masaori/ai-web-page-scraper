@@ -18,7 +18,7 @@ const isWebPageElement = (entity: unknown): entity is WebPageElement => {
     'webPageId' in entity &&
     typeof entity.webPageId === 'string' &&
     'type' in entity &&
-    typeof entity.type === 'string' &&
+    (typeof entity.type === 'string' || entity.type === null) &&
     'top' in entity &&
     typeof entity.top === 'number' &&
     'left' in entity &&
@@ -30,10 +30,12 @@ const isWebPageElement = (entity: unknown): entity is WebPageElement => {
   )
 }
 
-export class VectorDbWebPageElementRepository extends VectorDbRepository<WebPageElement> {
+export class VectorDbWebPageElementRepository extends VectorDbRepository<'id', WebPageElement> {
   constructor(qdrantClient: QdrantClient, openAiClient: OpenAiClient) {
-    super(qdrantCollectionName, isWebPageElement, qdrantClient, openAiClient)
+    super('id', qdrantCollectionName, isWebPageElement, qdrantClient, openAiClient)
   }
+
+  getById = async (id: string): PromisedResult<WebPageElement | null, UnknownRuntimeError> => this.getByPrimaryKey(id)
 
   getAllByWebPageId = async (webPageId: string): PromisedResult<WebPageElement[], UnknownRuntimeError> => {
     try {
@@ -49,6 +51,7 @@ export class VectorDbWebPageElementRepository extends VectorDbRepository<WebPage
           return this.isEntityType(point.payload) ? point.payload : null
         })
         .filter((entity): entity is WebPageElement => !!entity && entity.webPageId === webPageId)
+
       return Ok(entities)
     } catch (e) {
       console.error(`[VectorDbWebPageElementRepository] getAllByWebPageId: ${JSON.stringify(e)}`)

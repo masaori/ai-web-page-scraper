@@ -18,6 +18,8 @@ export class OpenAiClient {
       input: text,
     })
 
+    console.log(`[OpenAiClient] createEmbedding: usage: ${JSON.stringify(result.usage, null, 2)}`)
+
     return result.data
   }
 
@@ -26,6 +28,8 @@ export class OpenAiClient {
       model: 'gpt-4',
       messages,
     })
+
+    console.log(`[OpenAiClient] createChatCompletion: usage: ${JSON.stringify(result.usage, null, 2)}`)
 
     if (!result.choices[0]?.message) {
       throw new Error('[OpenAiClient]: Failed to get message')
