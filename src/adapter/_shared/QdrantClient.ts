@@ -17,6 +17,8 @@ export class QdrantClient {
 
   scroll: typeof this.client.scroll = (...args) => this.client.scroll(...args)
 
+  retrieve: typeof this.client.retrieve = (...args) => this.client.retrieve(...args)
+
   upsert: typeof this.client.upsert = (...args) => this.client.upsert(...args)
 
   delete: typeof this.client.delete = (...args) => this.client.delete(...args)

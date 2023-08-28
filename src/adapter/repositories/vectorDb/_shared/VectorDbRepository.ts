@@ -1,12 +1,22 @@
-import { NotFoundError } from 'openai/error'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4, validate as validateUUID } from 'uuid'
+import { createHash } from 'crypto'
 
-import { PromisedResult, UnknownRuntimeError, AlreadyExistsError, unknownRuntimeError } from '../../../../_shared/error'
+import { PromisedResult, UnknownRuntimeError, NotFoundError, AlreadyExistsError, unknownRuntimeError } from '../../../../_shared/error'
 import { QdrantClient } from '../../../_shared/QdrantClient'
 import { excludeNull } from '../../../../_shared/array'
-import { Ok } from '@sniptt/monads'
+import { Err, Ok } from '@sniptt/monads'
 import { OpenAiClient } from '../../../_shared/OpenAiClient'
 import { pascalCase } from 'change-case'
+
+const stringToUUID = (s: string): string => {
+  const hash = createHash('sha256').update(s).digest('hex')
+  const trimmedHash = hash.slice(0, 32)
+  const parts = [trimmedHash.slice(0, 8), trimmedHash.slice(8, 12), trimmedHash.slice(12, 16), trimmedHash.slice(16, 20), trimmedHash.slice(20, 32)]
+
+  return parts.join('-')
+}
+
+const uuidPrimaryKey = (primaryKey: string): string => (validateUUID(primaryKey) ? primaryKey : stringToUUID(primaryKey))
 
 export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPrimaryKey, string>> {
   constructor(
@@ -21,20 +31,20 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
 
   getByPrimaryKey = async (primaryKey: string): PromisedResult<T | null, UnknownRuntimeError> => {
     try {
-      const scrollResult = await this.qdrantClient.scroll(this.qdrantCollectionName)
-      const entities = scrollResult.points
-        .map((point) => {
-          if (!point.payload) {
-            console.error(`[VectorDbTRepository] getBy${pascalCase(this.primaryKeyName)}: point.payload is null. Ignored ${point.id}`)
+      const retrieveResult = await this.qdrantClient.retrieve(this.qdrantCollectionName, {
+        ids: [uuidPrimaryKey(primaryKey)],
+      })
+      const candidate = retrieveResult[0]
 
-            return null
-          }
+      if (!candidate) {
+        return Ok(null)
+      }
 
-          return this.isEntityType(point.payload) ? point.payload : null
-        })
-        .filter((entity): entity is T => !!entity && entity[this.primaryKeyName] === primaryKey)
+      if (!this.isEntityType(candidate.payload)) {
+        return unknownRuntimeError(`[VectorDbRepository] getByPrimaryKey: !this.isEntityType(candidate.payload) ${JSON.stringify(candidate)}`)
+      }
 
-      return Ok(entities[0] ?? null)
+      return Ok(candidate.payload)
     } catch (e) {
       console.error(`[VectorDbActionPlanRepository] getBy${pascalCase(this.primaryKeyName)}: ${JSON.stringify(e)}`)
 
@@ -52,7 +62,7 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
       const entities: T[] = excludeNull(
         scrollResult.points.map((point) => {
           if (!point.payload) {
-            console.error(`[QdrantTRepository] getAll: point.payload is null. Ignored ${point.id}`)
+            console.error(`[VectorDbRepository] getAll: point.payload is null. Ignored ${point.id}`)
 
             return null
           }
@@ -63,7 +73,58 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
 
       return Ok(entities)
     } catch (e) {
-      console.error(`[QdrantTRepository] getAll: ${JSON.stringify(e)}`)
+      console.error(`[VectorDbRepository] getAll: ${JSON.stringify(e)}`)
+
+      if (e instanceof Error) {
+        return unknownRuntimeError(e.message)
+      } else {
+        return unknownRuntimeError(JSON.stringify(e))
+      }
+    }
+  }
+
+  getByProperty = async (propertyName: string, value: string): PromisedResult<T | null, UnknownRuntimeError> => {
+    const getAllByPropertyResult = await this.getAllByProperty(propertyName, value)
+
+    if (getAllByPropertyResult.isErr()) {
+      return Err(getAllByPropertyResult.unwrapErr())
+    }
+
+    const entities = getAllByPropertyResult.unwrap()
+
+    return Ok(entities.length > 0 ? entities[0] : null)
+  }
+
+  getAllByProperty = async (propertyName: string, value: string): PromisedResult<T[], UnknownRuntimeError> => {
+    try {
+      const scrollResult = await this.qdrantClient.scroll(this.qdrantCollectionName, {
+        filter: {
+          must: [
+            {
+              key: propertyName,
+              match: {
+                value,
+              },
+            },
+          ],
+        },
+        limit: 100000,
+      })
+      const entities: T[] = excludeNull(
+        scrollResult.points.map((point) => {
+          if (!point.payload) {
+            console.error(`[VectorDbRepository] getByProperty: point.payload is null. Ignored ${point.id}`)
+
+            return null
+          }
+
+          return this.isEntityType(point.payload) ? point.payload : null
+        }),
+      )
+
+      return Ok(entities)
+    } catch (e) {
+      console.error(`[VectorDbRepository] getByProperty: ${JSON.stringify(e)}`)
 
       if (e instanceof Error) {
         return unknownRuntimeError(e.message)
@@ -84,11 +145,12 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
       const searchResult = await this.qdrantClient.search(this.qdrantCollectionName, {
         vector: createEmbeddingResult[0].embedding,
         limit,
+        score_threshold: 0.0,
       })
       const entities: T[] = excludeNull(
         searchResult.map((point) => {
           if (!point.payload) {
-            console.error(`[QdrantTRepository] getRelevant: point.payload is null. Ignored ${point.id}`)
+            console.error(`[VectorDbRepository] getRelevant: point.payload is null. Ignored ${point.id}`)
 
             return null
           }
@@ -99,7 +161,7 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
 
       return Ok(entities)
     } catch (e) {
-      console.error(`[QdrantTRepository] getRelevant: ${JSON.stringify(e)}`)
+      console.error(`[VectorDbRepository] getRelevant: ${JSON.stringify(e)}`)
 
       if (e instanceof Error) {
         return unknownRuntimeError(e.message)
@@ -116,10 +178,11 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
       if (createEmbeddingResult.length === 0) {
         return unknownRuntimeError('createEmbeddingResult.length === 0')
       }
+
       await this.qdrantClient.upsert(this.qdrantCollectionName, {
         points: [
           {
-            id: entity[this.primaryKeyName],
+            id: uuidPrimaryKey(entity[this.primaryKeyName]),
             vector: createEmbeddingResult[0].embedding,
             payload: entity,
           },
@@ -128,7 +191,7 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
 
       return Ok(entity)
     } catch (e) {
-      console.error(`[QdrantTRepository] create: ${JSON.stringify(e)}`)
+      console.error(`[VectorDbRepository] create: ${JSON.stringify(e)}`)
 
       if (e instanceof Error) {
         return unknownRuntimeError(e.message)
@@ -145,10 +208,11 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
       if (createEmbeddingResult.length === 0) {
         return unknownRuntimeError('createEmbeddingResult.length === 0')
       }
+
       await this.qdrantClient.upsert(this.qdrantCollectionName, {
         points: [
           {
-            id: entity[this.primaryKeyName],
+            id: uuidPrimaryKey(entity[this.primaryKeyName]),
             vector: createEmbeddingResult[0].embedding,
             payload: entity,
           },
@@ -157,7 +221,7 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
 
       return Ok(entity)
     } catch (e) {
-      console.error(`[QdrantTRepository] update: ${JSON.stringify(e)}`)
+      console.error(`[VectorDbRepository] update: ${JSON.stringify(e)}`)
 
       if (e instanceof Error) {
         return unknownRuntimeError(e.message)
@@ -170,12 +234,12 @@ export class VectorDbRepository<TPrimaryKey extends string, T extends Record<TPr
   delete = async (primaryKey: string): PromisedResult<void, UnknownRuntimeError | NotFoundError> => {
     try {
       await this.qdrantClient.delete(this.qdrantCollectionName, {
-        points: [primaryKey],
+        points: [uuidPrimaryKey(primaryKey)],
       })
 
       return Ok(undefined)
     } catch (e) {
-      console.error(`[QdrantTRepository] delete: ${JSON.stringify(e)}`)
+      console.error(`[VectorDbRepository] delete: ${JSON.stringify(e)}`)
 
       if (e instanceof Error) {
         return unknownRuntimeError(e.message)

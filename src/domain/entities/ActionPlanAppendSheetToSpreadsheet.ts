@@ -4,7 +4,8 @@ import { ActionPlan } from './ActionPlan'
 export type ActionPlanAppendSheetToSpreadsheet = {
   actionPlanId: Unique<ActionPlan['id']>
   type: 'appendSheetToSpreadsheet'
-  parentSpreadsheetTitle: string
-  title: string
+  parentSpreadsheetName: string
+  sheetName: string
+  sheetDescription: string
   collectedDataName: string
 }

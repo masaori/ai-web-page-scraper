@@ -17,7 +17,8 @@ export const checkEntityTypeActionPlan = (entity: unknown): entity is ActionPlan
       entity.type === 'observeWebPage' ||
       entity.type === 'collectData' ||
       entity.type === 'createSpreadsheet' ||
-      entity.type === 'appendSheetToSpreadsheet'
+      entity.type === 'appendSheetToSpreadsheet' ||
+      entity.type === 'reportResult'
     )
   ) {
     // console.log(`[checkEntityTypeActionPlan] entity is not ActionPlan: ${JSON.stringify(entity)}`)

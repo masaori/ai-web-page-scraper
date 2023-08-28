@@ -19,6 +19,8 @@ const isWebPageElement = (entity: unknown): entity is WebPageElement => {
     typeof entity.webPageId === 'string' &&
     'type' in entity &&
     (typeof entity.type === 'string' || entity.type === null) &&
+    'order' in entity &&
+    typeof entity.order === 'number' &&
     'top' in entity &&
     typeof entity.top === 'number' &&
     'left' in entity &&
@@ -37,30 +39,5 @@ export class VectorDbWebPageElementRepository extends VectorDbRepository<'id', W
 
   getById = async (id: string): PromisedResult<WebPageElement | null, UnknownRuntimeError> => this.getByPrimaryKey(id)
 
-  getAllByWebPageId = async (webPageId: string): PromisedResult<WebPageElement[], UnknownRuntimeError> => {
-    try {
-      const scrollResult = await this.qdrantClient.scroll(this.qdrantCollectionName)
-      const entities = scrollResult.points
-        .map((point) => {
-          if (!point.payload) {
-            console.error(`[VectorDbWebPageElementRepository] getAllByWebPageId: point.payload is null. Ignored ${point.id}`)
-
-            return null
-          }
-
-          return this.isEntityType(point.payload) ? point.payload : null
-        })
-        .filter((entity): entity is WebPageElement => !!entity && entity.webPageId === webPageId)
-
-      return Ok(entities)
-    } catch (e) {
-      console.error(`[VectorDbWebPageElementRepository] getAllByWebPageId: ${JSON.stringify(e)}`)
-
-      if (e instanceof Error) {
-        return unknownRuntimeError(e.message)
-      } else {
-        return unknownRuntimeError(JSON.stringify(e))
-      }
-    }
-  }
+  getAllByWebPageId = async (webPageId: string): PromisedResult<WebPageElement[], UnknownRuntimeError> => this.getAllByProperty('webPageId', webPageId)
 }

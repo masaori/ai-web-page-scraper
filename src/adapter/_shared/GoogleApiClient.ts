@@ -137,7 +137,7 @@ export class GoogleApiClient {
     await this.driveApi.permissions.create({
       fileId: response.data.spreadsheetId,
       requestBody: {
-        role: 'reader',
+        role: 'writer',
         type: 'anyone',
       },
     })

@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/index.ts",
   "scripts": {
-    "start": "ts-node ./src/index.ts",
+    "cli": "ts-node src/adapter/entryPoints/cli.ts",
     "start:vectordb": "docker run --name qdrant -d -p 6333:6333 -v $(pwd)/.qdrant:/qdrant/storage qdrant/qdrant",
     "gen": "npm run gen:entity-type-with-associations && npm run gen:check-entity-types && npm run gen:format-instructions && npm run gen:interface-repositories && npm run gen:vector-db-repositories && npm run gen:initialize-vector-db && npm run fmt",
     "gen:entity-type-with-associations": "ts-node scripts/generateEntityTypeWithAssociations.ts",
@@ -50,6 +50,7 @@
     "ast-to-entity-definitions": "^1.9.0",
     "buffer-image-size": "^0.6.4",
     "change-case": "^4.1.2",
+    "commander": "^11.0.0",
     "google-auth-library": "^9.0.0",
     "googleapis": "^126.0.1",
     "openai": "^4.0.0",

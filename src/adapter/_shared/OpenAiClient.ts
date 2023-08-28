@@ -1,11 +1,13 @@
 import fs from 'fs'
+import path from 'path'
 import { OpenAI } from 'openai'
 
 export class OpenAiClient {
   private openAiClient: OpenAI
 
   constructor() {
-    const OPENAI_API_KEY = fs.readFileSync('./openapi_key.txt', 'utf8').trim()
+    // './openapi_key.txt'
+    const OPENAI_API_KEY = fs.readFileSync(path.join(__dirname, '..', '..', '..', 'openapi_key.txt'), 'utf8').trim()
 
     this.openAiClient = new OpenAI({
       apiKey: OPENAI_API_KEY,

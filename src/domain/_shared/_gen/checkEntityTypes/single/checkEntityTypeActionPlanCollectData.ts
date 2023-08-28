@@ -11,12 +11,12 @@ export const checkEntityTypeActionPlanCollectData = (entity: unknown): entity is
     typeof entity.actionPlanId !== 'string' ||
     !('type' in entity) ||
     !(entity.type === 'collectData') ||
-    !('name' in entity) ||
-    typeof entity.name !== 'string' ||
+    !('collectedDataName' in entity) ||
+    typeof entity.collectedDataName !== 'string' ||
     !('webPageUrl' in entity) ||
     typeof entity.webPageUrl !== 'string' ||
-    !('description' in entity) ||
-    typeof entity.description !== 'string'
+    !('whatToCollect' in entity) ||
+    typeof entity.whatToCollect !== 'string'
   ) {
     // console.log(`[checkEntityTypeActionPlanCollectData] entity is not ActionPlanCollectData: ${JSON.stringify(entity)}`)
     return false

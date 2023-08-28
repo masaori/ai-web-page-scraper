@@ -7,15 +7,11 @@ import { WebPageElementWithAssociation } from '../../domain/entities/_gen/WebPag
 import { CollectedDataExtractor } from '../../domain/interfaces/extractors/CollectedDataExtractor'
 import { OpenAiClient } from '../_shared/OpenAiClient'
 import { Ok } from '@sniptt/monads'
-import { FileSystemClient } from '../_shared/FileSystemClient'
 
 export class LlmCollectedDataExtractor implements CollectedDataExtractor {
-  constructor(
-    private readonly openAiClient: OpenAiClient,
-    private readonly fileSystemClient: FileSystemClient,
-  ) {}
+  constructor(private readonly openAiClient: OpenAiClient) {}
 
-  extractByWebPageElementsAndActionPlanCollectData = async (
+  extractFromWebPageElementsAndActionPlanCollectData = async (
     webPageElements: WebPageElementWithAssociation[],
     actionPlanCollectData: ActionPlanCollectData,
   ): PromisedResult<CollectedDataWithAssociation, UnknownRuntimeError> => {
@@ -23,19 +19,27 @@ export class LlmCollectedDataExtractor implements CollectedDataExtractor {
     ${JSON.stringify(actionPlanCollectData, null, 2)}
 
     Current WebPageElements:
-    ${JSON.stringify(
-      webPageElements.map((e) => {
-        const copy: Partial<WebPageElementWithAssociation> = { ...e }
+    ${
+      // JSON.stringify(
+      //   webPageElements.map((e) => {
+      //     const copy: Partial<WebPageElementWithAssociation> = { ...e }
 
-        delete copy.id
-        delete copy.webPageId
-        delete copy.webPageElementId
+      //     delete copy.id
+      //     delete copy.webPageId
+      //     delete copy.webPageElementId
+      //     delete copy.order
+      //     delete copy.top
+      //     delete copy.left
+      //     delete copy.width
+      //     delete copy.height
 
-        return copy
-      }),
-      null,
-      2,
-    )}
+      //     return copy
+      //   }),
+      //   null,
+      //   2,
+      // )
+      webPageElements.map((e) => `${e.text} {left:${e.left},top:${e.top}}`).join('\n')
+    }
 
     ActionPlanCollectData:
     ${JSON.stringify(actionPlanCollectData, null, 2)}
@@ -49,6 +53,8 @@ export class LlmCollectedDataExtractor implements CollectedDataExtractor {
       ["data3", 3, "1999-12-31T23:59:59.999Z"]
     ]
     `
+
+    console.log(`[LlmCollectedDataExtractor] extractFromWebPageElementsAndActionPlanCollectData: prompt: ${prompt}`)
 
     const createChatCompletionResult = await this.openAiClient.createChatCompletion([
       {
@@ -69,7 +75,7 @@ export class LlmCollectedDataExtractor implements CollectedDataExtractor {
 
     if (typeof parsedMessageContent !== 'object' || !parsedMessageContent || !Array.isArray(parsedMessageContent)) {
       console.error(
-        `[LlmActionPlanPredictor] predictByWebPageAndUserRequestAndActionPlans: parsedMessageContent is array: ${JSON.stringify(
+        `[LlmActionPlanExtractor] extractFromWebPageAndUserRequestAndActionPlans: parsedMessageContent is array: ${JSON.stringify(
           parsedMessageContent,
           null,
           2,
@@ -82,7 +88,7 @@ export class LlmCollectedDataExtractor implements CollectedDataExtractor {
     for (const el of parsedMessageContent) {
       if (typeof parsedMessageContent !== 'object' || !parsedMessageContent || !Array.isArray(parsedMessageContent)) {
         console.error(
-          `[LlmActionPlanPredictor] predictByWebPageAndUserRequestAndActionPlans: element of parsedMessageContent is not array: ${JSON.stringify(
+          `[LlmActionPlanExtractor] extractFromWebPageAndUserRequestAndActionPlans: element of parsedMessageContent is not array: ${JSON.stringify(
             parsedMessageContent,
             null,
             2,
@@ -95,7 +101,7 @@ export class LlmCollectedDataExtractor implements CollectedDataExtractor {
       for (const e of el) {
         if (typeof e !== 'string' && typeof e !== 'number' && typeof e !== 'string') {
           console.error(
-            `[LlmActionPlanPredictor] predictByWebPageAndUserRequestAndActionPlans: element of element of parsedMessageContent is not string, number or ISO 8601 date string: ${JSON.stringify(
+            `[LlmActionPlanExtractor] extractFromWebPageAndUserRequestAndActionPlans: element of element of parsedMessageContent is not string, number or ISO 8601 date string: ${JSON.stringify(
               parsedMessageContent,
               null,
               2,
@@ -110,12 +116,14 @@ export class LlmCollectedDataExtractor implements CollectedDataExtractor {
     const collectedDataId = uuid().toString()
     const collectedDataWithAssociation: CollectedDataWithAssociation = {
       id: collectedDataId,
-      ...actionPlanCollectData,
+      name: actionPlanCollectData.collectedDataName,
+      webPageUrl: actionPlanCollectData.webPageUrl,
+      description: actionPlanCollectData.whatToCollect,
       dataJson: JSON.stringify(parsedMessageContent),
       spreadsheetSheet: null,
     }
 
-    console.log(`[LlmCollectedDataExtractor] extractByWebPageElementsAndActionPlanCollectData: ${JSON.stringify(parsedMessageContent, null, 2)}`)
+    console.log(`[LlmCollectedDataExtractor] extractFromWebPageElementsAndActionPlanCollectData: ${JSON.stringify(parsedMessageContent, null, 2)}`)
 
     return Ok(collectedDataWithAssociation)
   }

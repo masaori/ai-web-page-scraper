@@ -13,6 +13,8 @@ export const checkEntityTypeWebPageElement = (entity: unknown): entity is WebPag
     typeof entity.webPageId !== 'string' ||
     !('type' in entity) ||
     (entity.type !== null && !(entity.type === 'pageLink' || entity.type === 'text')) ||
+    !('order' in entity) ||
+    typeof entity.order !== 'number' ||
     !('top' in entity) ||
     typeof entity.top !== 'number' ||
     !('left' in entity) ||

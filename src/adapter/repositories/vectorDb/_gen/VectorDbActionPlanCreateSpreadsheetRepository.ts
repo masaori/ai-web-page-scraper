@@ -17,8 +17,10 @@ const isActionPlanCreateSpreadsheet = (entity: unknown): entity is ActionPlanCre
     typeof entity.actionPlanId === 'string' &&
     'type' in entity &&
     typeof entity.type === 'string' &&
-    'title' in entity &&
-    typeof entity.title === 'string'
+    'spreadsheetName' in entity &&
+    typeof entity.spreadsheetName === 'string' &&
+    'spreadsheetDescription' in entity &&
+    typeof entity.spreadsheetDescription === 'string'
   )
 }
 

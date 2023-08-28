@@ -4,7 +4,7 @@ import { CollectedDataWithAssociation } from '../../entities/_gen/CollectedDataW
 import { WebPageElementWithAssociation } from '../../entities/_gen/WebPageElementWithAssociation'
 
 export type CollectedDataExtractor = {
-  extractByWebPageElementsAndActionPlanCollectData: (
+  extractFromWebPageElementsAndActionPlanCollectData: (
     webPageElements: WebPageElementWithAssociation[],
     actionPlanCollectData: ActionPlanCollectDataWithAssociation,
   ) => PromisedResult<CollectedDataWithAssociation, UnknownRuntimeError>

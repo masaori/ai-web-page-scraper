@@ -1,10 +1,9 @@
 import { Ok } from '@sniptt/monads'
-import { AlreadyExistsError, PromisedResult, UnknownRuntimeError, unknownRuntimeError } from '../../../_shared/error'
+import { AlreadyExistsError, PromisedResult, UnknownRuntimeError, NotFoundError, unknownRuntimeError } from '../../../_shared/error'
 import { SpreadsheetSheet } from '../../../domain/entities/SpreadsheetSheet'
 import { SpreadsheetSheetRepository } from '../../../domain/interfaces/repositories/_gen/SpreadsheetSheetRepository'
 import { GoogleApiClient } from '../../_shared/GoogleApiClient'
 import { VectorDbSpreadsheetSheetRepository } from '../vectorDb/_gen/VectorDbSpreadsheetSheetRepository'
-import { NotFoundError } from 'openai/error'
 import { check2dArrayOfStringOrNumbers } from '../../../_shared/types'
 import { VectorDbCollectedDataRepository } from '../vectorDb/_gen/VectorDbCollectedDataRepository'
 

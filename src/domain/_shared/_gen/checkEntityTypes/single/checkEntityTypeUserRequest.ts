@@ -12,7 +12,9 @@ export const checkEntityTypeUserRequest = (entity: unknown): entity is UserReque
     !('url' in entity) ||
     typeof entity.url !== 'string' ||
     !('prompt' in entity) ||
-    typeof entity.prompt !== 'string'
+    typeof entity.prompt !== 'string' ||
+    !('requestedAt' in entity) ||
+    typeof entity.requestedAt !== 'string'
   ) {
     // console.log(`[checkEntityTypeUserRequest] entity is not UserRequest: ${JSON.stringify(entity)}`)
     return false

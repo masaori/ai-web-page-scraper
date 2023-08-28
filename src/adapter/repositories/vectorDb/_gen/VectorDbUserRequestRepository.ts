@@ -18,7 +18,9 @@ const isUserRequest = (entity: unknown): entity is UserRequest => {
     'url' in entity &&
     typeof entity.url === 'string' &&
     'prompt' in entity &&
-    typeof entity.prompt === 'string'
+    typeof entity.prompt === 'string' &&
+    'requestedAt' in entity &&
+    typeof entity.requestedAt === 'string'
   )
 }
 

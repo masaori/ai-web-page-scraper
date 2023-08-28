@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import { getEntityDefinitions } from 'ast-to-entity-definitions/bin/adapter/entry-points/function'
-import { camelCase, pascalCase, snakeCase } from 'change-case'
+import { pascalCase, snakeCase } from 'change-case'
 import { excludeNull } from '../src/_shared/array'
 
 export const generateVectorDbRepositories = async () => {
@@ -43,7 +43,6 @@ export const generateVectorDbRepositories = async () => {
     import { Ok } from '@sniptt/monads'
     /* eslint-enable @typescript-eslint/no-unused-vars, unused-imports/no-unused-imports-ts */
 
-
     const qdrantCollectionName = '${snakeCase(entityDefinition.name)}'
     const is${pascalCase(entityDefinition.name)} = (entity: unknown): entity is ${pascalCase(entityDefinition.name)} => {
       return (
@@ -83,34 +82,11 @@ export const generateVectorDbRepositories = async () => {
 
           if (property.isReference) {
             const methodName = property.isUnique ? `getBy${pascalCase(property.name)}` : `getAllBy${pascalCase(property.name)}`
+            const abstractMethodName = property.isUnique ? `getByProperty` : `getAllByProperty`
             const returnTypeName = property.isUnique ? `${pascalCase(entityDefinition.name)} | null` : `${pascalCase(entityDefinition.name)}[]`
 
             return `
-          ${methodName} = async (${property.name}: string): PromisedResult<${returnTypeName}, UnknownRuntimeError> => {
-            try {
-              const scrollResult = await this.qdrantClient.scroll(this.qdrantCollectionName)
-              const entities = scrollResult.points
-                .map((point) => {
-                  if (!point.payload) {
-                    console.error(\`[VectorDb${pascalCase(entityDefinition.name)}Repository] ${methodName}: point.payload is null. Ignored \${point.id}\`)
-
-                    return null
-                  }
-
-                  return this.isEntityType(point.payload) ? point.payload : null
-                })
-                .filter((entity): entity is ${pascalCase(entityDefinition.name)} => !!entity && entity.${camelCase(property.name)} === ${camelCase(property.name)})
-              ${property.isUnique ? 'return Ok(entities[0] ?? null)' : 'return Ok(entities)'}
-            } catch (e) {
-              console.error(\`[VectorDb${pascalCase(entityDefinition.name)}Repository] ${methodName}: \${JSON.stringify(e)}\`)
-
-              if (e instanceof Error) {
-                return unknownRuntimeError(e.message)
-              } else {
-                return unknownRuntimeError(JSON.stringify(e))
-              }
-            }
-          }
+          ${methodName} = async (${property.name}: string): PromisedResult<${returnTypeName}, UnknownRuntimeError> => this.${abstractMethodName}('${property.name}', ${property.name})
           `
           } else {
             return null

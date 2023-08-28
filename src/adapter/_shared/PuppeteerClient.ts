@@ -3,6 +3,8 @@ import fs from 'fs'
 import puppeteer, { Browser, ElementHandle, Page } from 'puppeteer'
 import imageSizeFromBuffer from 'buffer-image-size'
 
+import amazonCookiesJson from '../../../read.amazon.co.jp.cookies.json'
+
 export class PuppeteerClient {
   private browser: Browser | null = null
 
@@ -23,6 +25,7 @@ export class PuppeteerClient {
       return
     }
     this.browser = await puppeteer.launch({ headless: 'new' })
+    // this.browser = await puppeteer.launch({ headless: false })
   }
 
   private clickPointWithRetry = async (page: Page, point: { x: number; y: number }, retryCount = 60) => {
@@ -53,6 +56,9 @@ export class PuppeteerClient {
     }
 
     const page = await this.browser.newPage()
+
+    await page.setCookie(...amazonCookiesJson)
+    await page.setViewport({ width: 1600, height: 900 })
 
     this.pageByUrl[url] = page
     await page.goto(url)

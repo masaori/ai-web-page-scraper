@@ -4,5 +4,6 @@ import { ActionPlan } from './ActionPlan'
 export type ActionPlanCreateSpreadsheet = {
   actionPlanId: Unique<ActionPlan['id']>
   type: 'createSpreadsheet'
-  title: string
+  spreadsheetName: string
+  spreadsheetDescription: string
 }

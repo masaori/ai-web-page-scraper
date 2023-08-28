@@ -17,3 +17,7 @@ export const check2dArrayOfStringOrNumbers = (array: unknown): array is (string 
 
   return true
 }
+
+export const assertNever = (_value: never): never => {
+  throw new Error(`Unexpected value`)
+}

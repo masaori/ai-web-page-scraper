@@ -11,8 +11,10 @@ export const checkEntityTypeActionPlanCreateSpreadsheet = (entity: unknown): ent
     typeof entity.actionPlanId !== 'string' ||
     !('type' in entity) ||
     !(entity.type === 'createSpreadsheet') ||
-    !('title' in entity) ||
-    typeof entity.title !== 'string'
+    !('spreadsheetName' in entity) ||
+    typeof entity.spreadsheetName !== 'string' ||
+    !('spreadsheetDescription' in entity) ||
+    typeof entity.spreadsheetDescription !== 'string'
   ) {
     // console.log(`[checkEntityTypeActionPlanCreateSpreadsheet] entity is not ActionPlanCreateSpreadsheet: ${JSON.stringify(entity)}`)
     return false

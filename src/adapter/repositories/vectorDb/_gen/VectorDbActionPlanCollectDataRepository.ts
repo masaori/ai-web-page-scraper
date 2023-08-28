@@ -17,12 +17,12 @@ const isActionPlanCollectData = (entity: unknown): entity is ActionPlanCollectDa
     typeof entity.actionPlanId === 'string' &&
     'type' in entity &&
     typeof entity.type === 'string' &&
-    'name' in entity &&
-    typeof entity.name === 'string' &&
+    'collectedDataName' in entity &&
+    typeof entity.collectedDataName === 'string' &&
     'webPageUrl' in entity &&
     typeof entity.webPageUrl === 'string' &&
-    'description' in entity &&
-    typeof entity.description === 'string'
+    'whatToCollect' in entity &&
+    typeof entity.whatToCollect === 'string'
   )
 }
 

@@ -29,30 +29,6 @@ export class VectorDbActionPlanRepository extends VectorDbRepository<'id', Actio
 
   getById = async (id: string): PromisedResult<ActionPlan | null, UnknownRuntimeError> => this.getByPrimaryKey(id)
 
-  getAllByUserRequestId = async (userRequestId: string): PromisedResult<ActionPlan[], UnknownRuntimeError> => {
-    try {
-      const scrollResult = await this.qdrantClient.scroll(this.qdrantCollectionName)
-      const entities = scrollResult.points
-        .map((point) => {
-          if (!point.payload) {
-            console.error(`[VectorDbActionPlanRepository] getAllByUserRequestId: point.payload is null. Ignored ${point.id}`)
-
-            return null
-          }
-
-          return this.isEntityType(point.payload) ? point.payload : null
-        })
-        .filter((entity): entity is ActionPlan => !!entity && entity.userRequestId === userRequestId)
-
-      return Ok(entities)
-    } catch (e) {
-      console.error(`[VectorDbActionPlanRepository] getAllByUserRequestId: ${JSON.stringify(e)}`)
-
-      if (e instanceof Error) {
-        return unknownRuntimeError(e.message)
-      } else {
-        return unknownRuntimeError(JSON.stringify(e))
-      }
-    }
-  }
+  getAllByUserRequestId = async (userRequestId: string): PromisedResult<ActionPlan[], UnknownRuntimeError> =>
+    this.getAllByProperty('userRequestId', userRequestId)
 }

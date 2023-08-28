@@ -6,6 +6,7 @@ import { checkEntityTypeActionPlanClickWithAssociation } from '../withAssociatio
 import { checkEntityTypeActionPlanCollectDataWithAssociation } from '../withAssociation/checkEntityTypeActionPlanCollectDataWithAssociation'
 import { checkEntityTypeActionPlanCreateSpreadsheetWithAssociation } from '../withAssociation/checkEntityTypeActionPlanCreateSpreadsheetWithAssociation'
 import { checkEntityTypeActionPlanObserveWebPageWithAssociation } from '../withAssociation/checkEntityTypeActionPlanObserveWebPageWithAssociation'
+import { checkEntityTypeActionPlanReportResultWithAssociation } from '../withAssociation/checkEntityTypeActionPlanReportResultWithAssociation'
 
 export const checkEntityTypeActionPlanWithAssociation = (entity: unknown): entity is ActionPlanWithAssociation => {
   if (typeof entity !== 'object' || entity === null) {
@@ -22,7 +23,8 @@ export const checkEntityTypeActionPlanWithAssociation = (entity: unknown): entit
       checkEntityTypeActionPlanClickWithAssociation(entity) ||
       checkEntityTypeActionPlanCollectDataWithAssociation(entity) ||
       checkEntityTypeActionPlanCreateSpreadsheetWithAssociation(entity) ||
-      checkEntityTypeActionPlanObserveWebPageWithAssociation(entity)
+      checkEntityTypeActionPlanObserveWebPageWithAssociation(entity) ||
+      checkEntityTypeActionPlanReportResultWithAssociation(entity)
     )
   ) {
     return false

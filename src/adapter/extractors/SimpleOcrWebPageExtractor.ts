@@ -13,7 +13,7 @@ export class SimpleOcrWebPageExtractor implements WebPageExtractor {
     private readonly googleCloudVisionClient: GoogleCloudVisionClient,
   ) {}
 
-  extractByUrl = async (url: string): PromisedResult<WebPageWithAssociation, UnknownRuntimeError> => {
+  extractFromUrl = async (url: string): PromisedResult<WebPageWithAssociation, UnknownRuntimeError> => {
     try {
       const capturePageByUrlResult = await this.puppeteerClient.capturePageByUrl(url, { useCache: false })
       const webPageId = uuid().toString()
@@ -22,7 +22,7 @@ export class SimpleOcrWebPageExtractor implements WebPageExtractor {
 
       const webPageElements: WebPageWithAssociation['webPageElements'] = []
 
-      for (const block of ocrResult.blocks ?? []) {
+      for (const [i, block] of (ocrResult.blocks ?? []).entries()) {
         if (
           !block.boundingBox?.vertices ||
           !block.boundingBox?.vertices?.[0] ||
@@ -30,7 +30,7 @@ export class SimpleOcrWebPageExtractor implements WebPageExtractor {
           !block.boundingBox?.vertices?.[2] ||
           !block.boundingBox?.vertices?.[3]
         ) {
-          console.error(`[WebPageExtractor] extractByUrl: block.boundingBox is null`)
+          console.error(`[WebPageExtractor] extractFromUrl: block.boundingBox is null`)
 
           continue
         }
@@ -50,7 +50,7 @@ export class SimpleOcrWebPageExtractor implements WebPageExtractor {
           right === undefined ||
           right === null
         ) {
-          console.error(`[WebPageExtractor] extractByUrl: top, bottom, left, right is undefined`)
+          console.error(`[WebPageExtractor] extractFromUrl: top, bottom, left, right is undefined`)
 
           continue
         }
@@ -78,6 +78,7 @@ export class SimpleOcrWebPageExtractor implements WebPageExtractor {
               webPageElementId,
               webPageId,
               type: 'pageLink',
+              order: i + 1,
               top,
               left,
               width: right - left,
@@ -95,6 +96,7 @@ export class SimpleOcrWebPageExtractor implements WebPageExtractor {
             webPageElementId,
             webPageId,
             type: 'text',
+            order: i + 1,
             top,
             left,
             width: right - left,
@@ -114,7 +116,7 @@ export class SimpleOcrWebPageExtractor implements WebPageExtractor {
         webPageElements,
       })
     } catch (e) {
-      console.error(`[WebPageExtractor] extractByUrl: ${JSON.stringify(e)}`)
+      console.error(`[WebPageExtractor] extractFromUrl: ${JSON.stringify(e)}`)
 
       if (e instanceof Error) {
         return unknownRuntimeError(

@@ -35,57 +35,9 @@ export class VectorDbSpreadsheetSheetRepository extends VectorDbRepository<'id',
 
   getById = async (id: string): PromisedResult<SpreadsheetSheet | null, UnknownRuntimeError> => this.getByPrimaryKey(id)
 
-  getAllBySpreadsheetId = async (spreadsheetId: string): PromisedResult<SpreadsheetSheet[], UnknownRuntimeError> => {
-    try {
-      const scrollResult = await this.qdrantClient.scroll(this.qdrantCollectionName)
-      const entities = scrollResult.points
-        .map((point) => {
-          if (!point.payload) {
-            console.error(`[VectorDbSpreadsheetSheetRepository] getAllBySpreadsheetId: point.payload is null. Ignored ${point.id}`)
+  getAllBySpreadsheetId = async (spreadsheetId: string): PromisedResult<SpreadsheetSheet[], UnknownRuntimeError> =>
+    this.getAllByProperty('spreadsheetId', spreadsheetId)
 
-            return null
-          }
-
-          return this.isEntityType(point.payload) ? point.payload : null
-        })
-        .filter((entity): entity is SpreadsheetSheet => !!entity && entity.spreadsheetId === spreadsheetId)
-
-      return Ok(entities)
-    } catch (e) {
-      console.error(`[VectorDbSpreadsheetSheetRepository] getAllBySpreadsheetId: ${JSON.stringify(e)}`)
-
-      if (e instanceof Error) {
-        return unknownRuntimeError(e.message)
-      } else {
-        return unknownRuntimeError(JSON.stringify(e))
-      }
-    }
-  }
-
-  getByCollectedDataId = async (collectedDataId: string): PromisedResult<SpreadsheetSheet | null, UnknownRuntimeError> => {
-    try {
-      const scrollResult = await this.qdrantClient.scroll(this.qdrantCollectionName)
-      const entities = scrollResult.points
-        .map((point) => {
-          if (!point.payload) {
-            console.error(`[VectorDbSpreadsheetSheetRepository] getByCollectedDataId: point.payload is null. Ignored ${point.id}`)
-
-            return null
-          }
-
-          return this.isEntityType(point.payload) ? point.payload : null
-        })
-        .filter((entity): entity is SpreadsheetSheet => !!entity && entity.collectedDataId === collectedDataId)
-
-      return Ok(entities[0] ?? null)
-    } catch (e) {
-      console.error(`[VectorDbSpreadsheetSheetRepository] getByCollectedDataId: ${JSON.stringify(e)}`)
-
-      if (e instanceof Error) {
-        return unknownRuntimeError(e.message)
-      } else {
-        return unknownRuntimeError(JSON.stringify(e))
-      }
-    }
-  }
+  getByCollectedDataId = async (collectedDataId: string): PromisedResult<SpreadsheetSheet | null, UnknownRuntimeError> =>
+    this.getByProperty('collectedDataId', collectedDataId)
 }

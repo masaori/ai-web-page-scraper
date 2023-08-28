@@ -17,10 +17,12 @@ const isActionPlanAppendSheetToSpreadsheet = (entity: unknown): entity is Action
     typeof entity.actionPlanId === 'string' &&
     'type' in entity &&
     typeof entity.type === 'string' &&
-    'parentSpreadsheetTitle' in entity &&
-    typeof entity.parentSpreadsheetTitle === 'string' &&
-    'title' in entity &&
-    typeof entity.title === 'string' &&
+    'parentSpreadsheetName' in entity &&
+    typeof entity.parentSpreadsheetName === 'string' &&
+    'sheetName' in entity &&
+    typeof entity.sheetName === 'string' &&
+    'sheetDescription' in entity &&
+    typeof entity.sheetDescription === 'string' &&
     'collectedDataName' in entity &&
     typeof entity.collectedDataName === 'string'
   )

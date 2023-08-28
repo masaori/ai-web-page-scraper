@@ -2,7 +2,7 @@
 import { CollectedData } from '../../../entities/CollectedData'
 import { Spreadsheet } from '../../../entities/Spreadsheet'
 import { SpreadsheetSheet } from '../../../entities/SpreadsheetSheet'
-import { PromisedResult, UnknownRuntimeError } from '../../../../_shared/error'
+import { PromisedResult, UnknownRuntimeError, AlreadyExistsError, NotFoundError } from '../../../../_shared/error'
 
 export interface SpreadsheetSheetRepository {
   issueId: () => PromisedResult<string, UnknownRuntimeError>

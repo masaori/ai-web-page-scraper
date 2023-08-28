@@ -5,13 +5,13 @@ import { SimpleOcrWebPageExtractor } from './SimpleOcrWebPageExtractor'
 
 describe('SimpleOcrWebPageExtractor', () => {
   test(
-    'extractByUrl',
+    'extractFromUrl',
     async () => {
       const puppeteerClient = new PuppeteerClient(path.resolve(path.join(__dirname, '../../../tmp')))
       const googleCloudVisionClient = new GoogleCloudVisionClient()
       const ocrWebPageExtractor = new SimpleOcrWebPageExtractor(puppeteerClient, googleCloudVisionClient)
 
-      const result = await ocrWebPageExtractor.extractByUrl('https://www.amazon.co.jp/gp/bestsellers/instant-video/')
+      const result = await ocrWebPageExtractor.extractFromUrl('https://www.amazon.co.jp/gp/bestsellers/instant-video/')
 
       if (result.isErr()) {
         throw result.unwrapErr()

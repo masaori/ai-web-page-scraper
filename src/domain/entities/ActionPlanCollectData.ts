@@ -4,7 +4,7 @@ import { ActionPlan } from './ActionPlan'
 export type ActionPlanCollectData = {
   actionPlanId: Unique<ActionPlan['id']>
   type: 'collectData'
-  name: string
+  collectedDataName: string
   webPageUrl: string
-  description: string
+  whatToCollect: string
 }

@@ -11,10 +11,12 @@ export const checkEntityTypeActionPlanAppendSheetToSpreadsheet = (entity: unknow
     typeof entity.actionPlanId !== 'string' ||
     !('type' in entity) ||
     !(entity.type === 'appendSheetToSpreadsheet') ||
-    !('parentSpreadsheetTitle' in entity) ||
-    typeof entity.parentSpreadsheetTitle !== 'string' ||
-    !('title' in entity) ||
-    typeof entity.title !== 'string' ||
+    !('parentSpreadsheetName' in entity) ||
+    typeof entity.parentSpreadsheetName !== 'string' ||
+    !('sheetName' in entity) ||
+    typeof entity.sheetName !== 'string' ||
+    !('sheetDescription' in entity) ||
+    typeof entity.sheetDescription !== 'string' ||
     !('collectedDataName' in entity) ||
     typeof entity.collectedDataName !== 'string'
   ) {
